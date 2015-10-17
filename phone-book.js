@@ -7,42 +7,36 @@ var phoneBook = []; // Здесь вы храните записи как хот
    На вход может прийти что угодно, будьте осторожны.
 */
 module.exports.add = function add(name, phone, email) {
-    if (typeof(name) === 'string' && typeof(phone) === 'string' && typeof(email) === 'string') {
-        var lowerEmail = email.toLocaleLowerCase();
-        for (var i = 0; i < phoneBook.length; i++) {
-            if (phoneBook[i].name.toLocaleLowerCase() === name.toLocaleLowerCase()) {
-                return undefined;
-            }
+    if (typeof name !== 'string' || typeof phone !== 'string' || typeof email !== 'string') {
+        return;
+    }
+    var lowerEmail = email.toLocaleLowerCase();
+    for (var i = 0; i < phoneBook.length; i++) {
+        if (phoneBook[i].name.toLocaleLowerCase() === name.toLocaleLowerCase()) {
+            return;
         }
-        if (phoneTest(phone) && emailTest(lowerEmail)) {
-            phoneBook.push({name: name, phone: phone, email: lowerEmail});
-            //console.log('Контакт ' + name +  ' успешно добавлен.');
-        }
-        else {
-            //console.log('Контакт ' + name + ' не был добавлен.');
-        }
+    }
+    if (phoneTest(phone) && emailTest(lowerEmail)) {
+        phoneBook.push({name: name, phone: phone, email: lowerEmail});
+        //console.log('Контакт ' + name +  ' успешно добавлен.');
+    } else {
+        //console.log('Контакт ' + name + ' не был добавлен.');
     }
     // Ваша невероятная магия здесь
 
 };
 
-var phoneTest = function(phone) {
-    var regPhone = /^(\+\d|\d)?[\-\s]?((\(\d{3}\)\s)|(\d{3}\s?))\d{3}[\-\s]?\d[\-\s]?\d{3}$/i;
-    if (regPhone.test(phone)){
+var phoneTest = function (phone) {
+    var regPhone = /^\+?\d[\-\s]?((\(\d{3}\)\s)|(\d{3}\s?))\d{3}[\-\s]?\d[\-\s]?\d{3}$/i;
+    if (regPhone.test(phone)) {
         return true;
-    }
-    else {
-        return false;
     }
 };
 
-var emailTest = function(email) {
-    var regEmail = /^[a-zA-Z0-9_.+-]+@[a-zA-Zа-яА-Я0-9-]+(\.[a-zA-Zа-яА-Я0-9 -.]+)+$/;
-    if (regEmail.test(email)){
+var emailTest = function (email) {
+    var regEmail = /^[a-zA-Z0-9_.+-]+@[a-zA-Zа-яА-Я0-9-]+(\.[a-zA-Zа-яА-Я0-9]+)+$/;
+    if (regEmail.test(email)) {
         return true;
-    }
-    else {
-        return false;
     }
 };
 /*
@@ -56,21 +50,16 @@ module.exports.find = function find(query) {
     for (var i = 0; i < phoneBook.length; i++) {
         var curRecord = phoneBook[i];
         var lowerName = curRecord.name.toLocaleLowerCase();
-        if (lowerName.indexOf(lowerQuery) > -1) {
-            result.push(curRecord);
-            continue;
-        }
-        if (curRecord.email.indexOf(lowerQuery) > -1) {
-            result.push(curRecord);
-            continue;
-        }
-        if (curRecord.phone.indexOf(lowerQuery) > -1) {
-            result.push(curRecord);
+        var nameMatch = lowerName.indexOf(lowerQuery);
+        var phoneMatch = curRecord.email.indexOf(lowerQuery);
+        var emailMatch = curRecord.phone.indexOf(lowerQuery);
+        if ((nameMatch > -1) || (phoneMatch > -1) || (emailMatch > -1)) {
+            result.push(curRecord.name + ', ' + curRecord.phone + ', ' + curRecord.email);
             continue;
         }
     }
     for (i = 0; i < result.length; i++) {
-        console.log(result[i].name + ', ' + result[i].phone + ', ' + result[i].email);
+        console.log(result[i]);
     }
 };
 
@@ -85,17 +74,10 @@ module.exports.remove = function remove(query) {
     for (var i = 0; i < phoneBook.length; i++) {
         var curRecord = phoneBook[i];
         var lowerName = curRecord.name.toLocaleLowerCase();
-        if (lowerName.indexOf(lowerQuery) > -1) {
-            phoneBook.splice(i, 1);
-            counter += 1;
-            continue;
-        }
-        if (curRecord.email.indexOf(lowerQuery) > -1) {
-            phoneBook.splice(i, 1);
-            counter += 1;
-            continue;
-        }
-        if (curRecord.phone.indexOf(lowerQuery) > -1) {
+        var nameMatch = lowerName.indexOf(lowerQuery);
+        var phoneMatch = curRecord.email.indexOf(lowerQuery);
+        var emailMatch = curRecord.phone.indexOf(lowerQuery);
+        if ((nameMatch > -1) || (phoneMatch > -1) || (emailMatch > -1)) {
             phoneBook.splice(i, 1);
             counter += 1;
             continue;
@@ -113,7 +95,7 @@ module.exports.importFromCsv = function importFromCsv(filename) {
     // Ваша чёрная магия:
     // - Разбираете записи из `data`
     // - Добавляете каждую запись в книгу
-    data =  data.split('\r\n');
+    data = data.split('\r\n');
     for (var i = 0; i < data.length; i++) {
         var record = data[i].split(';');
         module.exports.add(record[0], record[1], record[2]);
@@ -124,68 +106,52 @@ module.exports.importFromCsv = function importFromCsv(filename) {
    Функция вывода всех телефонов в виде ASCII (задача со звёздочкой!).
 */
 
-var drawTopLine = function(lengthName, lengthPhone, lengthEmail) {
-    var line = '┌'
-    for (var i = 0; i < lengthName + 4; i++) {
-        line += '─';
+var generateNSymbol = function(symbol, n) {
+    var line = '';
+    for (var i = 0; i < n; i++) {
+        line += symbol;
     }
+    return line;
+};
+
+var drawTopLine = function (lengthName, lengthPhone, lengthEmail) {
+    var line = '┌';
+    line += generateNSymbol('─', lengthName + 4);
     line += '┬';
-    for (var i = 0; i < lengthPhone + 4; i++) {
-        line += '─';
-    }
+    line += generateNSymbol('─', lengthPhone + 4);
     line += '┬';
-    for (var i = 0; i < lengthEmail + 4; i++) {
-        line += '─';
-    }
+    line += generateNSymbol('─', lengthEmail + 4);
     line += '┐';
     return line;
 };
 
-var drawMiddleLine = function(lengthName, lengthPhone, lengthEmail) {
-    var line = '├'
-    for (var i = 0; i < lengthName + 4; i++) {
-        line += '─';
-    }
+var drawMiddleLine = function (lengthName, lengthPhone, lengthEmail) {
+    var line = '├';
+    line += generateNSymbol('─', lengthName + 4);
     line += '┼';
-    for (var i = 0; i < lengthPhone + 4; i++) {
-        line += '─';
-    }
+    line += generateNSymbol('─', lengthPhone + 4);
     line += '┼';
-    for (var i = 0; i < lengthEmail + 4; i++) {
-        line += '─';
-    }
+    line += generateNSymbol('─', lengthEmail + 4);
     line += '┤';
     return line;
 };
 
-var drawBottomLine = function(lengthName, lengthPhone, lengthEmail) {
-    var line = '└'
-    for (var i = 0; i < lengthName + 4; i++) {
-        line += '─';
-    }
+var drawBottomLine = function (lengthName, lengthPhone, lengthEmail) {
+    var line = '└';
+    line += generateNSymbol('─', lengthName + 4);
     line += '┴';
-    for (var i = 0; i < lengthPhone + 4; i++) {
-        line += '─';
-    }
+    line += generateNSymbol('─', lengthPhone + 4);
     line += '┴';
-    for (var i = 0; i < lengthEmail + 4; i++) {
-        line += '─';
-    }
+    line += generateNSymbol('─', lengthEmail + 4);
     line += '┘';
     return line;
 };
 
-var drawLine = function(name, lengthName, phone, lengthPhone, email, lengthEmail) {
+var drawLine = function (name, lengthName, phone, lengthPhone, email, lengthEmail) {
     var line = '│';
-    while (name.length < lengthName) {
-        name += ' ';
-    }
-    while (phone.length < lengthPhone) {
-        phone += ' ';
-    }
-    while (email.length < lengthEmail) {
-        email += ' ';
-    }
+    name += generateNSymbol(' ', lengthName - name.length);
+    phone += generateNSymbol(' ', lengthPhone - phone.length);
+    email += generateNSymbol(' ', lengthEmail - email.length);
     line += '  ' + name + '  │  ' + phone + '  │  ' + email + '  │';
     return line;
 };
@@ -193,7 +159,7 @@ var drawLine = function(name, lengthName, phone, lengthPhone, email, lengthEmail
 module.exports.showTable = function showTable(filename) {
     if (phoneBook.length === 0) {
         console.log('Телефонная книга пуста');
-        return undefined;
+        return;
     }
 
     var maxNameLength = 0;
@@ -217,7 +183,8 @@ module.exports.showTable = function showTable(filename) {
     console.log(drawMiddleLine(maxNameLength, maxPhoneLength, maxEmailLength));
     for (var i = 0; i < phoneBook.length; i++) {
         var cur = phoneBook[i];
-        console.log(drawLine(cur.name, maxNameLength, cur.phone, maxPhoneLength, cur.email, maxEmailLength))
+        console.log(drawLine(cur.name, maxNameLength,
+            cur.phone, maxPhoneLength, cur.email, maxEmailLength));
     }
     console.log(drawBottomLine(maxNameLength, maxPhoneLength, maxEmailLength));
 };
