@@ -116,33 +116,33 @@ var generateNSymbol = function(symbol, n) {
 
 var drawTopLine = function (lengthName, lengthPhone, lengthEmail) {
     var line = '┌';
-    line += generateNSymbol('─', lengthName + 4);
+    line += generateNSymbol('─', lengthName);
     line += '┬';
-    line += generateNSymbol('─', lengthPhone + 4);
+    line += generateNSymbol('─', lengthPhone);
     line += '┬';
-    line += generateNSymbol('─', lengthEmail + 4);
+    line += generateNSymbol('─', lengthEmail);
     line += '┐';
     return line;
 };
 
 var drawMiddleLine = function (lengthName, lengthPhone, lengthEmail) {
     var line = '├';
-    line += generateNSymbol('─', lengthName + 4);
+    line += generateNSymbol('─', lengthName);
     line += '┼';
-    line += generateNSymbol('─', lengthPhone + 4);
+    line += generateNSymbol('─', lengthPhone);
     line += '┼';
-    line += generateNSymbol('─', lengthEmail + 4);
+    line += generateNSymbol('─', lengthEmail);
     line += '┤';
     return line;
 };
 
 var drawBottomLine = function (lengthName, lengthPhone, lengthEmail) {
     var line = '└';
-    line += generateNSymbol('─', lengthName + 4);
+    line += generateNSymbol('─', lengthName);
     line += '┴';
-    line += generateNSymbol('─', lengthPhone + 4);
+    line += generateNSymbol('─', lengthPhone);
     line += '┴';
-    line += generateNSymbol('─', lengthEmail + 4);
+    line += generateNSymbol('─', lengthEmail);
     line += '┘';
     return line;
 };
@@ -178,13 +178,13 @@ module.exports.showTable = function showTable(filename) {
             maxEmailLength = currentRecord.email.length;
         }
     }
-    console.log(drawTopLine(maxNameLength, maxPhoneLength, maxEmailLength));
+    console.log(drawTopLine(maxNameLength + 4, maxPhoneLength + 4, maxEmailLength + 4));
     console.log(drawLine('Имя', maxNameLength, 'Телефон', maxPhoneLength, 'email', maxEmailLength));
-    console.log(drawMiddleLine(maxNameLength, maxPhoneLength, maxEmailLength));
+    console.log(drawMiddleLine(maxNameLength + 4, maxPhoneLength + 4, maxEmailLength + 4));
     for (var i = 0; i < phoneBook.length; i++) {
         var cur = phoneBook[i];
         console.log(drawLine(cur.name, maxNameLength,
             cur.phone, maxPhoneLength, cur.email, maxEmailLength));
     }
-    console.log(drawBottomLine(maxNameLength, maxPhoneLength, maxEmailLength));
+    console.log(drawBottomLine(maxNameLength + 4, maxPhoneLength + 4, maxEmailLength + 4));
 };
