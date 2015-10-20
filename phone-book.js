@@ -18,9 +18,6 @@ module.exports.add = function add(name, phone, email) {
     }
     if (phoneTest(phone) && emailTest(lowerEmail)) {
         phoneBook.push({name: name, phone: phone, email: lowerEmail});
-        //console.log('Контакт ' + name +  ' успешно добавлен.');
-    } else {
-        //console.log('Контакт ' + name + ' не был добавлен.');
     }
     // Ваша невероятная магия здесь
 
@@ -28,16 +25,12 @@ module.exports.add = function add(name, phone, email) {
 
 var phoneTest = function (phone) {
     var regPhone = /^\+?\d[\-\s]?((\(\d{3}\)\s)|(\d{3}\s?))\d{3}[\-\s]?\d[\-\s]?\d{3}$/i;
-    if (regPhone.test(phone)) {
-        return true;
-    }
+    return regPhone.test(phone);
 };
 
 var emailTest = function (email) {
     var regEmail = /^[a-zA-Z0-9_.+-]+@[a-zA-Zа-яА-Я0-9-]+(\.[a-zA-Zа-яА-Я0-9]+)+$/;
-    if (regEmail.test(email)) {
-        return true;
-    }
+    return regEmail.test(email);
 };
 /*
    Функция поиска записи в телефонную книгу.
@@ -157,7 +150,7 @@ var drawLine = function (name, lengthName, phone, lengthPhone, email, lengthEmai
 };
 
 module.exports.showTable = function showTable(filename) {
-    if (phoneBook.length === 0) {
+    if (!phoneBook.length) {
         console.log('Телефонная книга пуста');
         return;
     }
@@ -168,15 +161,9 @@ module.exports.showTable = function showTable(filename) {
     // Ваша чёрная магия здесь
     for (var i = 0; i < phoneBook.length; i++) {
         var currentRecord = phoneBook[i];
-        if (currentRecord.name.length > maxNameLength) {
-            maxNameLength = currentRecord.name.length;
-        }
-        if (currentRecord.phone.length > maxPhoneLength) {
-            maxPhoneLength = currentRecord.phone.length;
-        }
-        if (currentRecord.email.length > maxEmailLength) {
-            maxEmailLength = currentRecord.email.length;
-        }
+        maxNameLength = Math.max(currentRecord.name.length, maxNameLength);
+        maxPhoneLength = Math.max(currentRecord.phone.length, maxPhoneLength);
+        maxEmailLength = Math.max(currentRecord.email.length, maxEmailLength);
     }
     console.log(drawTopLine(maxNameLength + 4, maxPhoneLength + 4, maxEmailLength + 4));
     console.log(drawLine('Имя', maxNameLength, 'Телефон', maxPhoneLength, 'email', maxEmailLength));
